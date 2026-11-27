@@ -173,7 +173,9 @@ export const AuditReports: React.FC = () => {
             </div>
           ) : (
             <div className="my-4 flex flex-wrap items-center justify-center gap-8">
-              <svg width="144" height="144" viewBox="0 0 144 144" aria-label="PII category share chart">
+              <svg role="img" width="144" height="144" viewBox="0 0 144 144" aria-label="PII category share chart">
+                <title>Category Share Distribution</title>
+                <desc>{donutSegments.map((s) => `${CATEGORY_THEME[s.cat]?.label ?? s.cat}: ${s.val}`).join(', ')}</desc>
                 <circle
                   cx="72"
                   cy="72"

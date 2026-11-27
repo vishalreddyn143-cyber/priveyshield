@@ -52,4 +52,26 @@ describe('PrivyShield Accessibility (a11y) & Resilience', () => {
 
     spy.mockRestore();
   });
+
+  it('TooltipBadge manages aria-expanded, tooltip role, and Escape key dismissal', async () => {
+    const { TooltipBadge } = await import('../../src/components/common/TooltipBadge');
+    const { fireEvent } = await import('@testing-library/react');
+
+    render(<TooltipBadge term="Luhn" label="Luhn Algorithm" />);
+
+    const trigger = screen.getByRole('button', { name: /Explain Luhn/i });
+    expect(trigger.getAttribute('aria-expanded')).toBe('false');
+
+    // Click to open
+    fireEvent.click(trigger);
+    expect(trigger.getAttribute('aria-expanded')).toBe('true');
+    const tooltip = screen.getByRole('tooltip');
+    expect(tooltip).toBeTruthy();
+    expect(tooltip.textContent).toContain('Luhn');
+
+    // Press Escape to dismiss
+    fireEvent.keyDown(trigger, { key: 'Escape', code: 'Escape' });
+    expect(trigger.getAttribute('aria-expanded')).toBe('false');
+    expect(screen.queryByRole('tooltip')).toBeNull();
+  });
 });
