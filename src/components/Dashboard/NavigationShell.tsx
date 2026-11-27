@@ -36,6 +36,7 @@ export const NavigationShell: React.FC<{ children: React.ReactNode }> = ({ child
     canInstallPWA,
     triggerPWAInstall,
     setOnboardingOpen,
+    a11yAnnouncement,
   } = usePrivyShield();
 
   return (
@@ -44,6 +45,25 @@ export const NavigationShell: React.FC<{ children: React.ReactNode }> = ({ child
         visualEffects !== 'full' ? 'reduced-motion' : ''
       }`}
     >
+      {/* Accessible Skip to Content Link */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded-xl focus:border focus:border-cyan-400 focus:bg-[#050816] focus:px-4 focus:py-2.5 focus:text-sm focus:font-bold focus:text-cyan-300 focus:shadow-[0_0_25px_rgba(6,182,212,0.8)] focus:outline-none focus:ring-2 focus:ring-white"
+      >
+        Skip to main content
+      </a>
+
+      {/* Screen Reader Live Status Region */}
+      <div
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+        className="sr-only"
+        data-testid="a11y-announcer"
+      >
+        {a11yAnnouncement}
+      </div>
+
       {/* Full-viewport 3D ambient background */}
       <AmbientBackgroundWrapper
         visualEffects={visualEffects}
@@ -187,15 +207,28 @@ export const NavigationShell: React.FC<{ children: React.ReactNode }> = ({ child
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-[1440px] flex-1 px-4 py-6 sm:px-6">{children}</main>
+      <main
+        id="main-content"
+        role="main"
+        tabIndex={-1}
+        aria-label="Main application content"
+        className="mx-auto w-full max-w-[1440px] flex-1 px-4 py-6 sm:px-6 outline-none"
+      >
+        {children}
+      </main>
 
-      <footer className="border-t border-purple-500/15 bg-[#050816]/80 py-4 text-xs text-slate-400" style={{ boxShadow: '0 -1px 15px -5px rgba(168,85,247,0.1)' }}>
+      <footer
+        role="contentinfo"
+        aria-label="Platform footer"
+        className="border-t border-purple-500/15 bg-[#050816]/90 py-4 text-xs text-slate-300"
+        style={{ boxShadow: '0 -1px 15px -5px rgba(168,85,247,0.1)' }}
+      >
         <div className="mx-auto flex max-w-[1440px] flex-col items-start justify-between gap-2 px-4 sm:flex-row sm:items-center sm:px-6">
           <p>
-            <strong className="text-slate-200">PrivyShield</strong> — Your data stays yours. All PII
+            <strong className="text-white">PrivyShield</strong> — Your data stays yours. All PII
             detection, validation, and sanitization run locally in your browser.
           </p>
-          <p className="text-slate-500">
+          <p className="text-slate-300 font-medium">
             Zero document uploads • In-memory pseudonymization • Synthetic demos only
           </p>
         </div>

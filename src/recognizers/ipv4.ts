@@ -3,8 +3,8 @@ import { validateIPv4 } from '../engine/validator';
 import { CATEGORY_PRIORITY } from '../types/pii';
 import { RecognizerContext, RecognizerOutput } from './types';
 
-// Boundary avoids matching version numbers like v1.2.3.4 or embedded decimals
-const IPV4_CANDIDATE_REGEX = /(?<![A-Za-z0-9.])\d{1,3}(?:\.\d{1,3}){3}(?![\d.])/g;
+// Boundary avoids matching version numbers like v1.2.3.4 or embedded decimals, but allows trailing sentence punctuation
+const IPV4_CANDIDATE_REGEX = /(?<![A-Za-z0-9.])\d{1,3}(?:\.\d{1,3}){3}(?![\d]|\.\d)/g;
 
 export function recognizeIPv4(text: string, ctx: RecognizerContext): RecognizerOutput {
   const accepted: RecognizerOutput['accepted'] = [];

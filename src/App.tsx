@@ -1,4 +1,5 @@
 import React from 'react';
+import { ErrorBoundary } from './components/common/ErrorBoundary';
 import { NavigationShell } from './components/Dashboard/NavigationShell';
 import { OnboardingModal } from './components/Dashboard/OnboardingModal';
 import { PrivyShieldProvider, usePrivyShield } from './context/PrivyShieldContext';
@@ -28,12 +29,14 @@ const ActivePageRouter: React.FC = () => {
 
 export function App() {
   return (
-    <PrivyShieldProvider>
-      <NavigationShell>
-        <ActivePageRouter />
-      </NavigationShell>
-      <OnboardingModal />
-    </PrivyShieldProvider>
+    <ErrorBoundary>
+      <PrivyShieldProvider>
+        <NavigationShell>
+          <ActivePageRouter />
+        </NavigationShell>
+        <OnboardingModal />
+      </PrivyShieldProvider>
+    </ErrorBoundary>
   );
 }
 

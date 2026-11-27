@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   CheckCircle2,
   ChevronLeft,
@@ -62,11 +62,10 @@ export const OnboardingModal: React.FC = () => {
   const { onboardingOpen, setOnboardingOpen, setActivePage, loadSyntheticTextSample } =
     usePrivyShield();
   const [step, setStep] = useState(0);
-
-  if (!onboardingOpen) return null;
+  const modalContainerRef = useRef<HTMLDivElement>(null);
 
   const current = ONBOARDING_STEPS[step];
-  const Icon = current.icon;
+  const Icon = current?.icon ?? Shield;
   const isLast = step === ONBOARDING_STEPS.length - 1;
 
   const close = () => {
@@ -74,18 +73,71 @@ export const OnboardingModal: React.FC = () => {
     setStep(0);
   };
 
+  useEffect(() => {
+    if (!onboardingOpen) return;
+    const container = modalContainerRef.current;
+    if (!container) return;
+
+    // Trap focus inside modal
+    const getFocusables = () =>
+      container.querySelectorAll<HTMLElement>(
+        'button:not([disabled]), [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      );
+
+    const focusables = getFocusables();
+    if (focusables.length > 0) {
+      // Focus close button initially
+      focusables[0].focus();
+    }
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        close();
+        return;
+      }
+      if (e.key === 'Tab') {
+        const elements = getFocusables();
+        if (elements.length === 0) return;
+        const first = elements[0];
+        const last = elements[elements.length - 1];
+
+        if (e.shiftKey) {
+          if (document.activeElement === first) {
+            e.preventDefault();
+            last.focus();
+          }
+        } else {
+          if (document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
+          }
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [onboardingOpen]);
+
+  if (!onboardingOpen) return null;
+
   return (
     <div
+      ref={modalContainerRef}
       className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-4 backdrop-blur-md"
       role="dialog"
       aria-modal="true"
       aria-labelledby="onboarding-title"
+      aria-describedby="onboarding-description"
     >
       <div className="glass-panel relative w-full max-w-xl rounded-2xl p-6 shadow-2xl">
         <button
           type="button"
           onClick={close}
-          aria-label="Skip onboarding"
+          aria-label="Close guided tour"
           className="absolute right-4 top-4 rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-800 hover:text-white focus:outline-none focus:ring-2 focus:ring-cyan-400"
         >
           <X className="h-5 w-5" />
@@ -105,21 +157,26 @@ export const OnboardingModal: React.FC = () => {
           </div>
         </div>
 
-        <p className="mb-4 text-sm leading-relaxed text-slate-200">{current.body}</p>
+        <p id="onboarding-description" className="mb-4 text-sm leading-relaxed text-slate-200">
+          {current.body}
+        </p>
 
         <div className="mb-6 rounded-xl border border-cyan-500/25 bg-cyan-500/10 p-3 text-xs text-cyan-100">
           {current.highlight}
         </div>
 
         {/* Step dots */}
-        <div className="mb-5 flex items-center justify-center gap-1.5">
+        <div className="mb-5 flex items-center justify-center gap-1.5" role="tablist" aria-label="Tour step indicators">
           {ONBOARDING_STEPS.map((item, idx) => (
             <button
               key={item.title}
               type="button"
+              role="tab"
+              aria-selected={idx === step}
+              aria-current={idx === step ? 'step' : undefined}
               onClick={() => setStep(idx)}
-              aria-label={`Go to step ${idx + 1}`}
-              className={`h-2 rounded-full transition-all ${
+              aria-label={`Step ${idx + 1}: ${item.title}`}
+              className={`h-2 rounded-full transition-all focus:outline-none focus:ring-2 focus:ring-cyan-400 ${
                 idx === step ? 'w-6 bg-cyan-400' : 'w-2 bg-slate-700 hover:bg-slate-500'
               }`}
             />

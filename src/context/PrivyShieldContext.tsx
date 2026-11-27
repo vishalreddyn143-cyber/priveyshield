@@ -76,6 +76,10 @@ interface PrivyShieldContextValue {
   csvSanitizedRows: string[][];
   csvHeaders: string[];
 
+  // Accessibility Announcement
+  a11yAnnouncement: string;
+  announce: (message: string) => void;
+
   // Real Session Stats & Audit
   totalDocumentsProcessed: number;
   totalEntitiesDetectedSession: number;
@@ -172,6 +176,11 @@ export const PrivyShieldProvider: React.FC<{ children: React.ReactNode }> = ({ c
     emptyCategoryCounts
   );
   const [auditLog, setAuditLog] = useState<AuditLogEntry[]>([]);
+  const [a11yAnnouncement, setA11yAnnouncement] = useState<string>('');
+
+  const announce = useCallback((message: string) => {
+    setA11yAnnouncement(message);
+  }, []);
 
   const [privacyChecks, setPrivacyChecks] = useState<PrivacyVerificationChecks>({
     networkTest: 'not_tested',
@@ -261,6 +270,7 @@ export const PrivyShieldProvider: React.FC<{ children: React.ReactNode }> = ({ c
       setIsScanning(false);
       setScanProgress(100);
       setScanStage('Sanitization complete');
+      announce(`Sanitization complete. Detected ${params.detection.entities.length} PII entities. Sanitized with ${params.modeUsed} mode.`);
 
       setPrivacyChecks((prev) => ({
         ...prev,
@@ -582,7 +592,8 @@ export const PrivyShieldProvider: React.FC<{ children: React.ReactNode }> = ({ c
       countAsNewDocument: true,
       resetPseudonyms: true,
     });
-  }, [appendAudit, defaultMode, categoryPolicies, runProcessingPipeline]);
+    announce('Loaded synthetic demonstration document. Scanning completed.');
+  }, [announce, appendAudit, defaultMode, categoryPolicies, runProcessingPipeline]);
 
   const loadSyntheticCsvSample = useCallback(() => {
     const bytes = new TextEncoder().encode(SYNTHETIC_CSV_SAMPLE).length;
@@ -606,7 +617,8 @@ export const PrivyShieldProvider: React.FC<{ children: React.ReactNode }> = ({ c
       countAsNewDocument: true,
       resetPseudonyms: true,
     });
-  }, [appendAudit, defaultMode, categoryPolicies, runProcessingPipeline]);
+    announce('Loaded synthetic KYC CSV records. Scanning completed.');
+  }, [announce, appendAudit, defaultMode, categoryPolicies, runProcessingPipeline]);
 
   const clearWorkspace = useCallback(() => {
     cancelProcessing();
@@ -624,7 +636,8 @@ export const PrivyShieldProvider: React.FC<{ children: React.ReactNode }> = ({ c
     setSelectedEntityId(null);
     setResidualScan(INITIAL_RESIDUAL);
     setScanStage('Workspace cleared');
-  }, [cancelProcessing]);
+    announce('Workspace cleared. All document text and pseudonym mappings reset.');
+  }, [announce, cancelProcessing]);
 
   const setRedactionMode = useCallback(
     (mode: RedactionMode) => {
@@ -634,6 +647,7 @@ export const PrivyShieldProvider: React.FC<{ children: React.ReactNode }> = ({ c
           redactionMode: mode,
         })
       );
+      announce(`Switched redaction mode to ${mode}.`);
       if (documentText.trim()) {
         runProcessingPipeline(
           documentText,
@@ -644,7 +658,7 @@ export const PrivyShieldProvider: React.FC<{ children: React.ReactNode }> = ({ c
         );
       }
     },
-    [appendAudit, documentText, documentMeta, categoryPolicies, runProcessingPipeline]
+    [announce, appendAudit, documentText, documentMeta, categoryPolicies, runProcessingPipeline]
   );
 
   const updateCategoryPolicies = useCallback(
@@ -760,8 +774,9 @@ export const PrivyShieldProvider: React.FC<{ children: React.ReactNode }> = ({ c
           redactionMode: defaultMode,
         })
       );
+      announce(`Sanitized ${format.toUpperCase()} document downloaded.`);
     },
-    [sanitizedText, documentMeta, defaultMode, appendAudit]
+    [announce, sanitizedText, documentMeta, defaultMode, appendAudit]
   );
 
   const exportAuditReport = useCallback(
@@ -802,8 +817,10 @@ export const PrivyShieldProvider: React.FC<{ children: React.ReactNode }> = ({ c
           exportFormat: format,
         })
       );
+      announce(`Privacy audit report downloaded in ${format.toUpperCase()} format.`);
     },
     [
+      announce,
       documentMeta,
       detectionResult,
       defaultMode,
@@ -847,6 +864,8 @@ export const PrivyShieldProvider: React.FC<{ children: React.ReactNode }> = ({ c
       csvOriginalRows,
       csvSanitizedRows,
       csvHeaders,
+      a11yAnnouncement,
+      announce,
       totalDocumentsProcessed,
       totalEntitiesDetectedSession,
       totalEntitiesSanitizedSession,
@@ -896,6 +915,8 @@ export const PrivyShieldProvider: React.FC<{ children: React.ReactNode }> = ({ c
       csvOriginalRows,
       csvSanitizedRows,
       csvHeaders,
+      a11yAnnouncement,
+      announce,
       totalDocumentsProcessed,
       totalEntitiesDetectedSession,
       totalEntitiesSanitizedSession,

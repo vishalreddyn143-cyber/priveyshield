@@ -20,8 +20,8 @@ export function recognizeAadhaar(text: string, ctx: RecognizerContext): Recogniz
     const prevChar = text[start - 1];
     const nextChar = text[end];
 
-    // Skip if prefixed with '+' (international phone like +919876543210)
-    if (prevChar === '+' || prevChar === '.' || nextChar === '.') {
+    // Skip if prefixed with '+' (international phone like +919876543210) or embedded in a decimal number
+    if (prevChar === '+' || prevChar === '.' || (nextChar === '.' && text[end + 1] && /\d/.test(text[end + 1]))) {
       continue;
     }
 

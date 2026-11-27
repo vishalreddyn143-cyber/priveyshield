@@ -406,11 +406,12 @@ export const SanitizeWorkspace: React.FC = () => {
               </button>
             </div>
           ) : (
-            <label className="flex items-center gap-1.5 text-slate-300">
+            <label className="flex items-center gap-1.5 text-slate-300 cursor-pointer">
               <input
                 type="checkbox"
                 checked={syncScroll}
                 onChange={(e) => setSyncScroll(e.target.checked)}
+                aria-label="Synchronize scrolling between original and sanitized documents"
                 className="rounded border-slate-600 bg-slate-900 text-cyan-400 focus:ring-cyan-400"
               />
               Sync Scroll
@@ -475,11 +476,11 @@ export const SanitizeWorkspace: React.FC = () => {
             />
           ) : leftView === 'table' && isCSV ? (
             <div className="h-[430px] overflow-auto rounded-xl border border-slate-800 bg-slate-950/70">
-              <table className="w-full border-collapse text-left text-xs">
-                <thead className="sticky top-0 bg-slate-900 text-slate-300">
+              <table className="w-full border-collapse text-left text-xs" aria-label="Original CSV data preview">
+                <thead className="sticky top-0 bg-slate-900 text-slate-200">
                   <tr>
                     {csvOriginalRows[0]?.map((cell, cIdx) => (
-                      <th key={cIdx} className="border-b border-slate-800 px-2.5 py-2 font-semibold">
+                      <th key={cIdx} scope="col" className="border-b border-slate-800 px-2.5 py-2 font-semibold">
                         {cell}
                       </th>
                     ))}
@@ -782,11 +783,11 @@ export const SanitizeWorkspace: React.FC = () => {
 
           {rightView === 'table' && isCSV && csvSanitizedRows.length > 0 ? (
             <div className="h-[340px] overflow-auto rounded-xl border border-slate-800 bg-slate-950/70">
-              <table className="w-full border-collapse text-left text-xs">
+              <table className="w-full border-collapse text-left text-xs" aria-label="Sanitized CSV data preview">
                 <thead className="sticky top-0 bg-slate-900 text-teal-200">
                   <tr>
                     {csvSanitizedRows[0]?.map((cell, cIdx) => (
-                      <th key={cIdx} className="border-b border-slate-800 px-2.5 py-2 font-semibold">
+                      <th key={cIdx} scope="col" className="border-b border-slate-800 px-2.5 py-2 font-semibold">
                         {cell}
                       </th>
                     ))}
