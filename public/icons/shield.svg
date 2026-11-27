@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none">
+  <defs>
+    <linearGradient id="psGrad" x1="16" y1="12" x2="112" y2="116" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#8b5cf6" />
+      <stop offset="50%" stop-color="#3b82f6" />
+      <stop offset="100%" stop-color="#06b6d4" />
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="28" fill="#050816" />
+  <path
+    d="M64 16L104 32V62C104 88 86.5 107.5 64 114C41.5 107.5 24 88 24 62V32L64 16Z"
+    fill="url(#psGrad)"
+    fill-opacity="0.2"
+    stroke="url(#psGrad)"
+    stroke-width="5"
+    stroke-linejoin="round"
+  />
+  <path
+    d="M49 65L59 75L81 51"
+    stroke="#22d3ee"
+    stroke-width="6"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+</svg>
